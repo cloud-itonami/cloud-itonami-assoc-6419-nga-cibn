@@ -1,7 +1,9 @@
 (ns association-facts-test
   (:require [clojure.edn :as edn]
+            [clojure.data.json :as json]
             [clojure.java.io :as io] [clojure.java.shell :as shell]
             [clojure.test :refer [deftest is testing]]
+            [ed25519.core :as ed25519]
             [kotoba.compiler.core :as compiler] [kotoba.kir :as ir]))
 (def source (slurp "src/association_facts.kotoba"))
 (defn call [kir f & xs] (ir/execute kir f (vec xs)))
@@ -76,3 +78,20 @@
       (is (= (:budgets manifest) (:budgets artifact)))
       (finally
         (java.nio.file.Files/deleteIfExists component)))))
+
+(deftest murakumo-residency-receipt-is-verifiable
+  (let [evidence (edn/read-string
+                  (slurp "qualification/murakumo-asher.edn"))
+        receipt (:receipt evidence)
+        body (json/read-str (:payload receipt) :key-fn keyword)]
+    (is (= :cloud-itonami.murakumo-residency-evidence/v1
+           (:format evidence)))
+    (is (true? (get-in evidence [:launchd :restart-verified])))
+    (is (= (get-in evidence [:component :cid]) (:component-cid body)))
+    (is (= (get-in evidence [:component :sha256]) (:component-sha256 body)))
+    (is (= (get-in evidence [:component :expected-result]) (:result body)))
+    (is (false? (:ambient-wasi body)))
+    (is (ed25519/verify
+         (ed25519/unhex (:public-key receipt))
+         (.getBytes ^String (:payload receipt) "UTF-8")
+         (ed25519/unhex (:signature receipt))))))

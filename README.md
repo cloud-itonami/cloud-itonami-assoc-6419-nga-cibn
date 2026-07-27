@@ -73,6 +73,12 @@ nor duplicates `src/association_facts.kotoba`; the production catalog remains
 the sole source authority, while this probe proves Component residency before
 the catalog's richer string/option exports acquire qualified Canonical lowering.
 
+The canary is resident on murakumo node `asher` as the system LaunchDaemon
+`com.murakumo.kototama-component`. It binds loopback only, survived a forced
+process termination through launchd `KeepAlive`, and returns `6419002`.
+`qualification/murakumo-asher.edn` records the exact Component/runtime digests
+and an independently verifiable node-local Ed25519 execution receipt.
+
 ## License
 
 AGPL-3.0-or-later (matches the `cloud-itonami-iso3166-*` /
