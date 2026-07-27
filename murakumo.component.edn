@@ -1,0 +1,8 @@
+{:format :murakumo.kototama-component/v1
+ :name "cloud-itonami-assoc-6419-nga-cibn-canary"
+ :source "qualification/resident_canary.kotoba"
+ :target :wasm-component-kotoba-v1
+ :expected-result 6419002
+ :ambient-wasi false
+ :budgets {:fuel 512 :memory-pages 16 :deadline-ms 10000}
+ :placement {:replicas 1 :labels {:role "canary"}}}

@@ -63,6 +63,16 @@ compiler hosts only; neither is production authority. Compatibility is checked
 by observable values, typed ABI, empty effects, bounds, and fail-closed
 rejections—not compiler-output byte identity.
 
+## Resident Component canary
+
+`qualification/resident_canary.kotoba` is the provider-free vertical slice for
+the new murakumo runtime. CI compiles it to a sealed Wasm Component and executes
+it with the qualified Wasmtime 42 runtime. `murakumo.component.edn` binds its
+target, budgets, expected result, and canary-only placement. It neither replaces
+nor duplicates `src/association_facts.kotoba`; the production catalog remains
+the sole source authority, while this probe proves Component residency before
+the catalog's richer string/option exports acquire qualified Canonical lowering.
+
 ## License
 
 AGPL-3.0-or-later (matches the `cloud-itonami-iso3166-*` /

@@ -1,7 +1,8 @@
 (ns association-facts-test
-  (:require [clojure.java.io :as io] [clojure.java.shell :as shell]
+  (:require [clojure.edn :as edn]
+            [clojure.java.io :as io] [clojure.java.shell :as shell]
             [clojure.test :refer [deftest is testing]]
-            [kotoba.compiler.core :as compiler] [kotoba.compiler.ir :as ir]))
+            [kotoba.compiler.core :as compiler] [kotoba.kir :as ir]))
 (def source (slurp "src/association_facts.kotoba"))
 (defn call [kir f & xs] (ir/execute kir f (vec xs)))
 (defn present [x] (when (second x) (nth x 2)))
@@ -48,3 +49,30 @@
     (is (zero? (:exit p)) (str (:out p) (:err p)))))
 (deftest production-source-authority
   (is (= ["src/association_facts.kotoba"] (->> (file-seq (io/file "src")) (filter #(.isFile %)) (map str) sort vec))))
+
+(deftest resident-component-canary
+  (let [canary-source (slurp "qualification/resident_canary.kotoba")
+        manifest (edn/read-string (slurp "murakumo.component.edn"))
+        artifact (compiler/compile-component
+                  canary-source {}
+                  {:budgets (:budgets manifest)})
+        component (java.nio.file.Files/createTempFile
+                   "cloud-itonami-cibn-" ".component.wasm"
+                   (make-array java.nio.file.attribute.FileAttribute 0))]
+    (try
+      (java.nio.file.Files/write
+       component ^bytes (:bytes artifact)
+       (make-array java.nio.file.OpenOption 0))
+      (let [run (shell/sh "wasmtime" "run" "--invoke" "main()"
+                          (.toString component))]
+        (is (zero? (:exit run)) (str (:out run) (:err run)))
+        (is (= (str (:expected-result manifest))
+               (.trim ^String (:out run)))))
+      (is (= :murakumo.kototama-component/v1 (:format manifest)))
+      (is (= :wasm-component-kotoba-v1 (:target artifact) (:target manifest)))
+      (is (= #{} (:capabilities artifact)))
+      (is (= [] (:imports artifact)))
+      (is (false? (get-in artifact [:admission-request :ambient-wasi])))
+      (is (= (:budgets manifest) (:budgets artifact)))
+      (finally
+        (java.nio.file.Files/deleteIfExists component)))))
