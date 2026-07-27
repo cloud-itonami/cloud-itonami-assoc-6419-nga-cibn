@@ -1,0 +1,29 @@
+{:format :cloud-itonami.effectful-component/v1
+ :name "cloud-itonami-assoc-6419-nga-cibn-effects"
+ :source "qualification/effectful_app.kotoba"
+ :target :wasm-component-kotoba-v1
+ :expected-result 6419003
+ :ambient-wasi false
+ :policy {:allow #{[:cap/call 4] [:cap/call 11] [:cap/call 12]}}
+ :component-abilities
+ {4 {:target "http://127.0.0.1:11434/api/show"
+     :operation :http/post
+     :max-bytes 1048576
+     :max-items 1
+     :deadline-ms 10000
+     :audit-id "cloud-itonami-cibn-http-v1"}
+  11 {:target "http://127.0.0.1:11434/api/generate"
+      :operation :llm/generate
+      :max-bytes 1048576
+      :max-items 1
+      :deadline-ms 180000
+      :audit-id "cloud-itonami-cibn-llm-v1"}
+  12 {:target "/Users/asher/.murakumo/kototama-component/cloud-itonami-effects.jsonl"
+      :operation :storage/transact
+      :max-bytes 2097152
+      :max-items 1
+      :deadline-ms 5000
+      :audit-id "cloud-itonami-cibn-storage-v1"}}
+ :capability-config "qualification/effectful-capabilities.json"
+ :budgets {:fuel 100000 :memory-pages 16 :deadline-ms 240000}
+ :placement {:replicas 1 :labels {:role "effectful-canary" :node "asher"}}}

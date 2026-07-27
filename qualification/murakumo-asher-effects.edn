@@ -1,0 +1,34 @@
+{:format :cloud-itonami.murakumo-effect-residency-evidence/v1
+ :observed-at "2026-07-27T04:24:22Z"
+ :node "asher"
+ :launchd {:label "com.murakumo.kototama-component"
+           :state :running
+           :keep-alive true
+           :restart-verified true
+           :pid-before 43409
+           :pid-after 43461
+           :runs-after 28}
+ :endpoint "http://127.0.0.1:18901"
+ :component
+ {:cid "bafkreiabxs7vsm4iv54wlwopyxztirmuqz5ldyiei3r5ugenjhy5jmatei"
+  :sha256 "01bcbf593388af7965d9cfc5f3344594867ab1e10446e3da188d49f1d4b01322"
+  :expected-result 6419003
+  :ambient-wasi false
+  :canonical-lowering :scalar-with-capabilities
+  :fuel-enforcement :module-global}
+ :capability-config
+ {:sha256 "127d76973ec639e5226632672d450810134faf84984359a368dd40252e43aa94"
+  :imports ["aiueos-http-post"
+            "aiueos-storage-transact"
+            "aiueos-llm-generate"]
+  :http "http://127.0.0.1:11434/api/show"
+  :storage "/Users/asher/.murakumo/kototama-component/cloud-itonami-effects.jsonl"
+  :llm "http://127.0.0.1:11434/api/generate"
+  :storage-records-after-restart 5}
+ :runtime
+ {:name "tender-component/0.1.0+wasmtime-42.0.1"
+  :sha256 "fd146fd0a667720d3a3e68fc1d4c96fb8aaab68ae4a41eadc20bcad7f53e8348"}
+ :receipt
+ {:public-key "11348d3a5d803ba519490161b8ca7276eaae43f63b68260827b347ef54d131a7"
+  :payload "{\"ambient-wasi\":false,\"capabilities\":[\"aiueos-http-post\",\"aiueos-storage-transact\",\"aiueos-llm-generate\"],\"capability-config-sha256\":\"127d76973ec639e5226632672d450810134faf84984359a368dd40252e43aa94\",\"component-cid\":\"bafkreiabxs7vsm4iv54wlwopyxztirmuqz5ldyiei3r5ugenjhy5jmatei\",\"component-sha256\":\"01bcbf593388af7965d9cfc5f3344594867ab1e10446e3da188d49f1d4b01322\",\"effects\":[{\"ability-audit-id\":\"cloud-itonami-cibn-http-v1\",\"at-ms\":1785126256059,\"capability\":\"aiueos-http-post\",\"request\":6419,\"response-bytes\":68336,\"result\":68336,\"target\":\"http://127.0.0.1:11434/api/show\"},{\"ability-audit-id\":\"cloud-itonami-cibn-storage-v1\",\"at-ms\":1785126256064,\"capability\":\"aiueos-storage-transact\",\"request\":68336,\"response-bytes\":68424,\"result\":68424,\"target\":\"/Users/asher/.murakumo/kototama-component/cloud-itonami-effects.jsonl\"},{\"ability-audit-id\":\"cloud-itonami-cibn-llm-v1\",\"at-ms\":1785126256647,\"capability\":\"aiueos-llm-generate\",\"request\":68424,\"response-bytes\":4,\"result\":6419003,\"target\":\"http://127.0.0.1:11434/api/generate\"}],\"expected-result\":6419003,\"finished-at-ms\":1785126256647,\"format\":\"kototama.component-execution-receipt/v1\",\"fuel\":100000,\"memory-pages\":16,\"node\":\"asher\",\"receipt-public-key\":\"11348d3a5d803ba519490161b8ca7276eaae43f63b68260827b347ef54d131a7\",\"result\":6419003,\"runtime\":\"tender-component/0.1.0+wasmtime-42.0.1\",\"started-at-ms\":1785126256053,\"status\":\"ok\"}"
+  :signature "b19edaa046073481e75581ee41a976531edd323da0e420048251395f32fe09967b6544910e21bec42a7820e708e8e2425b0e2f2eee3acff756020efe35137b0a"}}

@@ -79,6 +79,37 @@
       (finally
         (java.nio.file.Files/deleteIfExists component)))))
 
+(deftest effectful-component-is-closed-and-least-authority
+  (let [manifest (edn/read-string
+                  (slurp "murakumo.effectful-component.edn"))
+        config (json/read-str
+                (slurp (:capability-config manifest))
+                :key-fn keyword)
+        artifact (compiler/compile-component
+                  (slurp (:source manifest))
+                  (:policy manifest)
+                  {:budgets (:budgets manifest)
+                   :component-abilities (:component-abilities manifest)})]
+    (is (= :cloud-itonami.effectful-component/v1 (:format manifest)))
+    (is (= "kototama.resident-capabilities/v1" (:format config)))
+    (is (= #{:aiueos.component/aiueos-http-post
+             :aiueos.component/aiueos-llm-generate
+             :aiueos.component/aiueos-storage-transact}
+           (:capabilities artifact)))
+    (is (= (set (keys (:component-imports artifact)))
+           (:capabilities artifact)))
+    (is (= #{[:cap/call 4] [:cap/call 11] [:cap/call 12]}
+           (get-in artifact [:admission :required])))
+    (is (= (:budgets manifest) (:budgets artifact)))
+    (is (= :module-global (:fuel-enforcement artifact)))
+    (is (false? (get-in artifact [:admission-request :ambient-wasi])))
+    (is (= "http://127.0.0.1:11434/api/show"
+           (get-in config [:http :endpoint])))
+    (is (= "/Users/asher/.murakumo/kototama-component/cloud-itonami-effects.jsonl"
+           (get-in config [:storage :log])))
+    (is (= "http://127.0.0.1:11434/api/generate"
+           (get-in config [:llm :endpoint])))))
+
 (deftest murakumo-residency-receipt-is-verifiable
   (let [evidence (edn/read-string
                   (slurp "qualification/murakumo-asher.edn"))
@@ -91,6 +122,35 @@
     (is (= (get-in evidence [:component :sha256]) (:component-sha256 body)))
     (is (= (get-in evidence [:component :expected-result]) (:result body)))
     (is (false? (:ambient-wasi body)))
+    (is (ed25519/verify
+         (ed25519/unhex (:public-key receipt))
+         (.getBytes ^String (:payload receipt) "UTF-8")
+         (ed25519/unhex (:signature receipt))))))
+
+(deftest murakumo-effect-receipt-proves-the-complete-chain
+  (let [evidence (edn/read-string
+                  (slurp "qualification/murakumo-asher-effects.edn"))
+        receipt (:receipt evidence)
+        body (json/read-str (:payload receipt) :key-fn keyword)
+        effects (:effects body)]
+    (is (= :cloud-itonami.murakumo-effect-residency-evidence/v1
+           (:format evidence)))
+    (is (true? (get-in evidence [:launchd :restart-verified])))
+    (is (= (get-in evidence [:component :cid]) (:component-cid body)))
+    (is (= (get-in evidence [:component :sha256]) (:component-sha256 body)))
+    (is (= 6419003 (:result body)))
+    (is (false? (:ambient-wasi body)))
+    (is (= ["aiueos-http-post"
+            "aiueos-storage-transact"
+            "aiueos-llm-generate"]
+           (:capabilities body)
+           (mapv :capability effects)))
+    (is (= [6419 68336 68424] (mapv :request effects)))
+    (is (= [68336 68424 6419003] (mapv :result effects)))
+    (is (= (get-in evidence [:capability-config :imports])
+           (:capabilities body)))
+    (is (= (get-in evidence [:capability-config :sha256])
+           (:capability-config-sha256 body)))
     (is (ed25519/verify
          (ed25519/unhex (:public-key receipt))
          (.getBytes ^String (:payload receipt) "UTF-8")

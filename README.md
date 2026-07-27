@@ -79,6 +79,16 @@ process termination through launchd `KeepAlive`, and returns `6419002`.
 `qualification/murakumo-asher.edn` records the exact Component/runtime digests
 and an independently verifiable node-local Ed25519 execution receipt.
 
+`qualification/effectful_app.kotoba` is the first effectful
+production-shaped slice. Kotoba owns the sequence
+`http/post -> storage/transact -> llm/generate -> decision`; the host receives
+only the abilities in the SHA-pinned
+`qualification/effectful-capabilities.json`. Those abilities name two literal
+Ollama loopback endpoints and one absolute append-only storage log. The live
+asher run, forced restart, exact artifacts, three effect calls, and
+independently verified receipt are recorded in
+`qualification/murakumo-asher-effects.edn`.
+
 ## License
 
 AGPL-3.0-or-later (matches the `cloud-itonami-iso3166-*` /

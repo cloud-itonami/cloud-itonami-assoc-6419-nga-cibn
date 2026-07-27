@@ -1,0 +1,15 @@
+(ns cloud-itonami.cibn.effectful
+  (:export [main])
+  (:capabilities #{:http/post :storage/transact :llm/generate}))
+
+;; Product orchestration stays in Kotoba. The host can execute only the exact
+;; HTTP, append-only storage, and LLM abilities sealed into the deployment.
+(defn main []
+  (let [http-bytes (cap-call :http/post 6419)
+        stored-bytes (cap-call :storage/transact http-bytes)
+        llm-status (cap-call :llm/generate stored-bytes)]
+    (if (and (> http-bytes 0)
+             (> stored-bytes 0)
+             (= llm-status 6419003))
+      llm-status
+      -1)))
