@@ -1,0 +1,19 @@
+{:format :cloud-itonami.murakumo-residency-evidence/v1
+ :observed-at "2026-07-27T03:57:20Z"
+ :node "asher"
+ :launchd {:label "com.murakumo.kototama-component"
+           :run-at-load true
+           :keep-alive true
+           :restart-verified true}
+ :endpoint "http://127.0.0.1:18901"
+ :component {:cid "bafkreieuedg6qftafxc66n55kphyi7yehimgytmgittcon5wjol5kup7a4"
+             :sha256 "9420cde816602dc5ef37bd53cf847f043a186c4d8644e62737b64b97d551ff07"
+             :expected-result 6419002
+             :ambient-wasi false}
+ :runtime {:name "tender-component/0.1.0+wasmtime-42.0.1"
+           :sha256 "1e3a9b4b8263cbcfcd48583bc415ec3cdecab703fbe68913c53a0a3d1f850a5c"}
+ :receipt
+ {:algorithm :ed25519
+  :public-key "11348d3a5d803ba519490161b8ca7276eaae43f63b68260827b347ef54d131a7"
+  :payload "{\"ambient-wasi\":false,\"component-cid\":\"bafkreieuedg6qftafxc66n55kphyi7yehimgytmgittcon5wjol5kup7a4\",\"component-sha256\":\"9420cde816602dc5ef37bd53cf847f043a186c4d8644e62737b64b97d551ff07\",\"expected-result\":6419002,\"finished-at-ms\":1785124631188,\"format\":\"kototama.component-execution-receipt/v1\",\"fuel\":512,\"memory-pages\":16,\"node\":\"asher\",\"receipt-public-key\":\"11348d3a5d803ba519490161b8ca7276eaae43f63b68260827b347ef54d131a7\",\"result\":6419002,\"runtime\":\"tender-component/0.1.0+wasmtime-42.0.1\",\"started-at-ms\":1785124631185,\"status\":\"ok\"}"
+  :signature "38b960522aaae5ccdc42d281630c79c0106830540aee77c78ebf08b731f08730e5adae3d80ae88c13e3f49e2dfd768ec5fcf6c77fbeaec1c5dbee897cdf0e60b"}}

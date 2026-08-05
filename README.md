@@ -63,6 +63,32 @@ compiler hosts only; neither is production authority. Compatibility is checked
 by observable values, typed ABI, empty effects, bounds, and fail-closed
 rejections—not compiler-output byte identity.
 
+## Resident Component canary
+
+`qualification/resident_canary.kotoba` is the provider-free vertical slice for
+the new murakumo runtime. CI compiles it to a sealed Wasm Component and executes
+it with the qualified Wasmtime 42 runtime. `murakumo.component.edn` binds its
+target, budgets, expected result, and canary-only placement. It neither replaces
+nor duplicates `src/association_facts.kotoba`; the production catalog remains
+the sole source authority, while this probe proves Component residency before
+the catalog's richer string/option exports acquire qualified Canonical lowering.
+
+The canary is resident on murakumo node `asher` as the system LaunchDaemon
+`com.murakumo.kototama-component`. It binds loopback only, survived a forced
+process termination through launchd `KeepAlive`, and returns `6419002`.
+`qualification/murakumo-asher.edn` records the exact Component/runtime digests
+and an independently verifiable node-local Ed25519 execution receipt.
+
+`qualification/effectful_app.kotoba` is the first effectful
+production-shaped slice. Kotoba owns the sequence
+`http/post -> storage/transact -> llm/generate -> decision`; the host receives
+only the abilities in the SHA-pinned
+`qualification/effectful-capabilities.json`. Those abilities name two literal
+Ollama loopback endpoints and one absolute append-only storage log. The live
+asher run, forced restart, exact artifacts, three effect calls, and
+independently verified receipt are recorded in
+`qualification/murakumo-asher-effects.edn`.
+
 ## License
 
 AGPL-3.0-or-later (matches the `cloud-itonami-iso3166-*` /

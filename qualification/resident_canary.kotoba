@@ -1,0 +1,8 @@
+(ns cloud-itonami.cibn.resident
+  (:export [main]))
+
+;; 6419 = banking/other monetary intermediation, 002 = admitted CIBN facts.
+;; This small, provider-free export proves that the catalog's release can stay
+;; resident as a sealed Component before the richer string/option catalog ABI
+;; is qualified for Canonical lowering.
+(defn main [] :i64 6419002)

@@ -1,0 +1,29 @@
+{
+  "format": "kototama.resident-capabilities/v1",
+  "http": {
+    "endpoint": "http://127.0.0.1:11434/api/show",
+    "request-body": {
+      "model": "gemma4:e4b-it-qat"
+    },
+    "request-code": 6419,
+    "max-response-bytes": 1048576,
+    "deadline-ms": 10000,
+    "audit-id": "cloud-itonami-cibn-http-v1"
+  },
+  "storage": {
+    "log": "/Users/asher/.murakumo/kototama-component/cloud-itonami-effects.jsonl",
+    "max-write-bytes": 2097152,
+    "deadline-ms": 5000,
+    "audit-id": "cloud-itonami-cibn-storage-v1"
+  },
+  "llm": {
+    "endpoint": "http://127.0.0.1:11434/api/generate",
+    "model": "gemma4:e4b-it-qat",
+    "prompt": "You are the bounded CIBN catalog analyst. Inspect the supplied local model metadata only. Return one short sentence confirming whether it is a usable local inference provider. Do not propose or execute any external action.",
+    "success-code": 6419003,
+    "max-request-bytes": 1048576,
+    "max-response-bytes": 1048576,
+    "deadline-ms": 180000,
+    "audit-id": "cloud-itonami-cibn-llm-v1"
+  }
+}

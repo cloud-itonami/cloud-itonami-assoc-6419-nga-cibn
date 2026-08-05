@@ -1,7 +1,10 @@
 (ns association-facts-test
-  (:require [clojure.java.io :as io] [clojure.java.shell :as shell]
+  (:require [clojure.edn :as edn]
+            [clojure.data.json :as json]
+            [clojure.java.io :as io] [clojure.java.shell :as shell]
             [clojure.test :refer [deftest is testing]]
-            [kotoba.compiler.core :as compiler] [kotoba.compiler.ir :as ir]))
+            [ed25519.core :as ed25519]
+            [kotoba.compiler.core :as compiler] [kotoba.kir :as ir]))
 (def source (slurp "src/association_facts.kotoba"))
 (defn call [kir f & xs] (ir/execute kir f (vec xs)))
 (defn present [x] (when (second x) (nth x 2)))
@@ -48,3 +51,107 @@
     (is (zero? (:exit p)) (str (:out p) (:err p)))))
 (deftest production-source-authority
   (is (= ["src/association_facts.kotoba"] (->> (file-seq (io/file "src")) (filter #(.isFile %)) (map str) sort vec))))
+
+(deftest resident-component-canary
+  (let [canary-source (slurp "qualification/resident_canary.kotoba")
+        manifest (edn/read-string (slurp "murakumo.component.edn"))
+        artifact (compiler/compile-component
+                  canary-source {}
+                  {:budgets (:budgets manifest)})
+        component (java.nio.file.Files/createTempFile
+                   "cloud-itonami-cibn-" ".component.wasm"
+                   (make-array java.nio.file.attribute.FileAttribute 0))]
+    (try
+      (java.nio.file.Files/write
+       component ^bytes (:bytes artifact)
+       (make-array java.nio.file.OpenOption 0))
+      (let [run (shell/sh "wasmtime" "run" "--invoke" "main()"
+                          (.toString component))]
+        (is (zero? (:exit run)) (str (:out run) (:err run)))
+        (is (= (str (:expected-result manifest))
+               (.trim ^String (:out run)))))
+      (is (= :murakumo.kototama-component/v1 (:format manifest)))
+      (is (= :wasm-component-kotoba-v1 (:target artifact) (:target manifest)))
+      (is (= #{} (:capabilities artifact)))
+      (is (= [] (:imports artifact)))
+      (is (false? (get-in artifact [:admission-request :ambient-wasi])))
+      (is (= (:budgets manifest) (:budgets artifact)))
+      (finally
+        (java.nio.file.Files/deleteIfExists component)))))
+
+(deftest effectful-component-is-closed-and-least-authority
+  (let [manifest (edn/read-string
+                  (slurp "murakumo.effectful-component.edn"))
+        config (json/read-str
+                (slurp (:capability-config manifest))
+                :key-fn keyword)
+        artifact (compiler/compile-component
+                  (slurp (:source manifest))
+                  (:policy manifest)
+                  {:budgets (:budgets manifest)
+                   :component-abilities (:component-abilities manifest)})]
+    (is (= :cloud-itonami.effectful-component/v1 (:format manifest)))
+    (is (= "kototama.resident-capabilities/v1" (:format config)))
+    (is (= #{:aiueos.component/aiueos-http-post
+             :aiueos.component/aiueos-llm-generate
+             :aiueos.component/aiueos-storage-transact}
+           (:capabilities artifact)))
+    (is (= (set (keys (:component-imports artifact)))
+           (:capabilities artifact)))
+    (is (= #{[:cap/call 4] [:cap/call 11] [:cap/call 12]}
+           (get-in artifact [:admission :required])))
+    (is (= (:budgets manifest) (:budgets artifact)))
+    (is (= :module-global (:fuel-enforcement artifact)))
+    (is (false? (get-in artifact [:admission-request :ambient-wasi])))
+    (is (= "http://127.0.0.1:11434/api/show"
+           (get-in config [:http :endpoint])))
+    (is (= "/Users/asher/.murakumo/kototama-component/cloud-itonami-effects.jsonl"
+           (get-in config [:storage :log])))
+    (is (= "http://127.0.0.1:11434/api/generate"
+           (get-in config [:llm :endpoint])))))
+
+(deftest murakumo-residency-receipt-is-verifiable
+  (let [evidence (edn/read-string
+                  (slurp "qualification/murakumo-asher.edn"))
+        receipt (:receipt evidence)
+        body (json/read-str (:payload receipt) :key-fn keyword)]
+    (is (= :cloud-itonami.murakumo-residency-evidence/v1
+           (:format evidence)))
+    (is (true? (get-in evidence [:launchd :restart-verified])))
+    (is (= (get-in evidence [:component :cid]) (:component-cid body)))
+    (is (= (get-in evidence [:component :sha256]) (:component-sha256 body)))
+    (is (= (get-in evidence [:component :expected-result]) (:result body)))
+    (is (false? (:ambient-wasi body)))
+    (is (ed25519/verify
+         (ed25519/unhex (:public-key receipt))
+         (.getBytes ^String (:payload receipt) "UTF-8")
+         (ed25519/unhex (:signature receipt))))))
+
+(deftest murakumo-effect-receipt-proves-the-complete-chain
+  (let [evidence (edn/read-string
+                  (slurp "qualification/murakumo-asher-effects.edn"))
+        receipt (:receipt evidence)
+        body (json/read-str (:payload receipt) :key-fn keyword)
+        effects (:effects body)]
+    (is (= :cloud-itonami.murakumo-effect-residency-evidence/v1
+           (:format evidence)))
+    (is (true? (get-in evidence [:launchd :restart-verified])))
+    (is (= (get-in evidence [:component :cid]) (:component-cid body)))
+    (is (= (get-in evidence [:component :sha256]) (:component-sha256 body)))
+    (is (= 6419003 (:result body)))
+    (is (false? (:ambient-wasi body)))
+    (is (= ["aiueos-http-post"
+            "aiueos-storage-transact"
+            "aiueos-llm-generate"]
+           (:capabilities body)
+           (mapv :capability effects)))
+    (is (= [6419 68336 68424] (mapv :request effects)))
+    (is (= [68336 68424 6419003] (mapv :result effects)))
+    (is (= (get-in evidence [:capability-config :imports])
+           (:capabilities body)))
+    (is (= (get-in evidence [:capability-config :sha256])
+           (:capability-config-sha256 body)))
+    (is (ed25519/verify
+         (ed25519/unhex (:public-key receipt))
+         (.getBytes ^String (:payload receipt) "UTF-8")
+         (ed25519/unhex (:signature receipt))))))
