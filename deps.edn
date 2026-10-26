@@ -3,27 +3,44 @@
         ;; kotoba.json replaced clojure.data.json here (2026-09-24). An explicit
         ;; floor: kotoba.json/read-str and /write-str first exist at 9c11ad1, and
         ;; tools.deps takes the NEWEST sha it is shown.
-        io.github.kotoba-lang/json {:git/sha "9c11ad189e64907700e8b4eb9b26f40336bffa01"}
+        io.github.kotoba-lang/json
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "38654600c00caea2caec9ec0650625f2f6a69378"
+         :deps/root "lib/kotoba.json"}
         ;; kotoba.bytes replaced java.util.Base64 here (2026-09-24). An explicit
         ;; floor: tools.deps takes the NEWEST sha it is shown.
-        io.github.kotoba-lang/bytes {:git/sha "d5259f35ab7c4f5a66e63ca29ed4dcf7ba3f1ac5"}
+        io.github.kotoba-lang/bytes
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "38654600c00caea2caec9ec0650625f2f6a69378"
+         :deps/root "lib/kotoba.bytes"}
         ;; kotoba.io replaced java.nio.file.Files here (2026-09-24). An explicit
         ;; floor: temp-dir temp-file read-all-bytes write-bytes write-string
         ;; delete-if-exists are in kotoba.io from this sha, and tools.deps takes
         ;; the NEWEST sha it is shown.
-        io.github.kotoba-lang/io {:git/sha "1b60ca825c1e705bd195f857ca4549133653a9f3"}
+        io.github.kotoba-lang/io
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "38654600c00caea2caec9ec0650625f2f6a69378"
+         :deps/root "lib/kotoba.io"}
         ;; kotoba.process replaced clojure.java.shell here (2026-09-24). An explicit
         ;; floor: kotoba.process/sh parses clojure.java.shell's options from db49ea9,
         ;; and tools.deps takes the NEWEST sha it is shown.
-        io.github.kotoba-lang/process {:git/sha "db49ea936e53d0bc698be0db79bf96ad86b5f7d0"}
+        io.github.kotoba-lang/process
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "38654600c00caea2caec9ec0650625f2f6a69378"
+         :deps/root "lib/kotoba.process"}
         ;; kotoba.lang.edn replaced clojure.edn here (2026-09-23). An explicit floor:
         ;; tools.deps takes the NEWEST sha it is shown, and kbb resolves git deps
         ;; only from nbb.edn, so every project file this repo has names it.
-        io.github.kotoba-lang/edn {:git/sha "79dba32c8892058842c57783f06a2dfe4601aeb0"}
+        io.github.kotoba-lang/edn
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "38654600c00caea2caec9ec0650625f2f6a69378"
+         :deps/root "lib/kotoba.edn"}
        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
         ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
-        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
-                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}org.clojure/clojure {:mvn/version "1.12.0"}
+        io.github.kotoba-lang/test
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "38654600c00caea2caec9ec0650625f2f6a69378"
+         :deps/root "lib/kotoba.test"}org.clojure/clojure {:mvn/version "1.12.0"}
         io.github.kotoba-lang/amu {:git/url "https://github.com/kotoba-lang/amu.git"
                                         :git/sha "2257a729a13f72ec1962cb9501413bffdd36dd3f"}}
  :aliases
@@ -35,7 +52,9 @@
          ;; twice from two checkouts. Same sha, same repository; the explicit
          ;; :git/url is dropped because io.github.<org>/<name> derives it.
          :extra-deps {io.github.kotoba-lang/org-ietf-ed25519
-                      {:git/sha "fdcefb9f1b83461fee54d04b63e374fa301ee847"}
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "38654600c00caea2caec9ec0650625f2f6a69378"
+         :deps/root "lib/org.ietf.ed25519"}
                       org.clojure/data.json {:mvn/version "2.5.0"}
                       io.github.cognitect-labs/test-runner
                       {:git/tag "v0.5.1" :git/sha "dfb30dd6605cb6c0efc275e1df1736f6e90d4d73"}}
